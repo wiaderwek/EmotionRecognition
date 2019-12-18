@@ -7,9 +7,32 @@ import random
 from joblib import Parallel, delayed
 import multiprocessing
 import tensorflow as tf
+import threading
+import random
+import os
+import functools
 
 from constants import *
 from midi_util import *
+
+class threadsafe_iterator:
+    def __init__(self, iterator):
+        self.iterator = iterator
+        self.lock = threading.Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.iterator)
+
+def threadsafe_generator(func):
+    """Decorator"""
+    @functools.wraps(func)
+    def gen(*a, **kw):
+        return threadsafe_iterator(func(*a, **kw))
+    return gen
 
 def compute_beat(beat, notes_in_bar):
     return one_hot(beat % notes_in_bar, notes_in_bar)
@@ -36,7 +59,7 @@ def stagger(data, time_steps):
         dataY.append(data[i + 1:(i + time_steps + 1)])
     return dataX, dataY
 
-def load_all(emotions, batch_size, time_steps):
+def load_all(emotions, time_steps):
     """
     Loads all MIDI files as a piano roll.
     (For Keras)
@@ -73,6 +96,46 @@ def load_all(emotions, batch_size, time_steps):
     note_target = np.array(note_target)
     return [note_data, note_target, beat_data, emotion_data], [note_target]
 
+@threadsafe_generator
+def data_generator(emotions, batch_size, time_steps):   
+    
+    while 1:
+        note_data = []
+        beat_data = []
+        emotion_data = []
+
+        note_target = []
+        
+        for _ in range(batch_size):   
+            emotion = random.choice(emotions)
+            emotion_id = emotions.index(emotion)
+            emotion_hot = one_hot(emotion_id , NUM_EMOTIONS)
+        
+            seq = load_midi(get_random_file(emotion))
+        
+            if len(seq) >= time_steps:
+                # Clamp MIDI to note range
+                seq = clamp_midi(seq)
+                # Create training data and labels
+                train_data, label_data = stagger(seq, time_steps)
+                #print(note_data.shape())
+                #print(train_data.shape())
+                print("test")
+                note_data = note_data + train_data
+                note_target += label_data
+
+                beats = [compute_beat(i, NOTES_PER_BAR) for i in range(len(seq))]
+                beat_data += stagger(beats, time_steps)[0]
+
+                emotion_data += stagger([emotion_hot for i in range(len(seq))], time_steps)[0]
+        
+        note_data = np.array(note_data)
+        beat_data = np.array(beat_data)
+        emotion_data = np.array(emotion_data)
+        note_target = np.array(note_target)
+        
+        yield [note_data, note_target, beat_data, emotion_data], [note_target]
+    
 def clamp_midi(sequence):
     """
     Clamps the midi base on the MIN and MAX notes
@@ -101,3 +164,10 @@ def get_all_files(paths):
                 if os.path.isfile(fname) and fname.endswith('.mid'):
                     potential_files.append(fname)
     return potential_files
+
+def get_random_file(path):    
+    for root, dirs, files in os.walk(path):
+        fname = random.choice(files)
+        fdir = os.path.join(root, fname)
+        if os.path.isfile(fdir) and fname.endswith('.mid'):
+            return fdir

@@ -40,6 +40,7 @@ END_OF_TRACK = 'end_of_track'
 # Training parameters
 BATCH_SIZE = 16
 SEQ_LEN = 8 * NOTES_PER_BAR
+STEPS_PER_EPOCH = 10
 
 # Hyper Parameters
 OCTAVE_UNITS = 64
