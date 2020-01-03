@@ -103,6 +103,7 @@ def midi_decode(midi,
     merged_volume = None
 
     for track in midi.tracks:
+                    
         # The downsampled sequences
         replay_sequence = []
         volume_sequence = []
@@ -112,6 +113,10 @@ def midi_decode(midi,
         volume_buffer = [np.zeros((classes,))]
 
         for i, msg in enumerate(track):
+            if msg.type in [NOTE_ON, NOTE_OFF]:
+                if msg.channel > 7:
+                    continue
+
             # Duplicate the last note pattern to wait for next event
             for _ in range(msg.time):
                 replay_buffer.append(np.zeros(classes))
@@ -230,10 +235,3 @@ def clean_midi(fname):
         midi.tracks.remove(track)
 
     midi.save(fname)
-
-if __name__ == '__main__':
-    # Test
-    # p = midi.read_midifile("out/test_in.mid")
-    p = midi.read_midifile("out/test_in.mid")
-    p = midi_encode(midi_decode(p))
-    midi.write_midifile("out/test_out.mid", p)
