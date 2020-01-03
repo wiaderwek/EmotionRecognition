@@ -103,11 +103,6 @@ def midi_decode(midi,
     merged_volume = None
 
     for track in midi.tracks:
-        #skip drum instruments
-        for i, msg in enumerate(track):
-            if msg.type in [NOTE_ON, NOTE_ON]:
-                if msg.channel == 9:
-                    continue
                     
         # The downsampled sequences
         replay_sequence = []
@@ -118,8 +113,8 @@ def midi_decode(midi,
         volume_buffer = [np.zeros((classes,))]
 
         for i, msg in enumerate(track):
-            if msg.type in [NOTE_ON, NOTE_ON]:
-                if msg.channel == 9:
+            if msg.type in [NOTE_ON, NOTE_OFF]:
+                if msg.channel > 7:
                     continue
 
             # Duplicate the last note pattern to wait for next event

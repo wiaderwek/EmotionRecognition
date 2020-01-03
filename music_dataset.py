@@ -55,9 +55,18 @@ def stagger(data, time_steps):
 
     # Chop a sequence into measures
     for i in range(0, len(data) - time_steps, NOTES_PER_BAR):
-        dataX.append(data[i:i + time_steps])
-        dataY.append(data[i + 1:(i + time_steps + 1)])
+        if np.count_nonzero(data[i:i + time_steps]) > 0:
+            dataX.append(data[i:i + time_steps])
+            dataY.append(data[i + 1:(i + time_steps + 1)])
     return dataX, dataY
+
+def clean_data(data, time_steps):
+    cleaned_data = []
+
+    for i in range(0, len(data) - time_steps, time_steps):
+        if np.count_nonzero(data[i:i + time_steps]) > 5:
+            cleaned_data.extend(data[i:i + time_steps])
+    return cleaned_data
 
 def load_all(emotions, time_steps):
     """
@@ -81,7 +90,9 @@ def load_all(emotions, time_steps):
                 # Clamp MIDI to note range
                 seq = clamp_midi(seq)
                 # Create training data and labels
+                seq = clean_data(seq, time_steps)
                 train_data, label_data = stagger(seq, time_steps)
+                
                 note_data += train_data
                 note_target += label_data
 
@@ -116,12 +127,12 @@ def data_generator(emotions, batch_size, time_steps):
             if len(seq) >= time_steps:
                 # Clamp MIDI to note range
                 seq = clamp_midi(seq)
+                
                 # Create training data and labels
+                seq = remove_empty_sequences(seq, time_steps)
                 train_data, label_data = stagger(seq, time_steps)
-                #print(note_data.shape())
-                #print(train_data.shape())
-                print("test")
-                note_data = note_data + train_data
+                
+                note_data += train_data
                 note_target += label_data
 
                 beats = [compute_beat(i, NOTES_PER_BAR) for i in range(len(seq))]
