@@ -55,9 +55,8 @@ def stagger(data, time_steps):
 
     # Chop a sequence into measures
     for i in range(0, len(data) - time_steps, NOTES_PER_BAR):
-        if np.count_nonzero(data[i:i + time_steps]) > 0:
-            dataX.append(data[i:i + time_steps])
-            dataY.append(data[i + 1:(i + time_steps + 1)])
+        dataX.append(data[i:i + time_steps])
+        dataY.append(data[i + 1:(i + time_steps + 1)])
     return dataX, dataY
 
 def clean_data(data, time_steps):
@@ -129,7 +128,7 @@ def data_generator(emotions, batch_size, time_steps):
                 seq = clamp_midi(seq)
                 
                 # Create training data and labels
-                seq = remove_empty_sequences(seq, time_steps)
+                seq = clean_data(seq, time_steps)
                 train_data, label_data = stagger(seq, time_steps)
                 
                 note_data += train_data
