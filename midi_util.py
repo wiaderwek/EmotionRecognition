@@ -4,6 +4,7 @@ Handles MIDI file loading
 import mido
 import numpy as np
 import os
+import operator
 from constants import *
 
 def midi_encode(note_seq, resolution=NOTES_PER_BEAT, step=120):
@@ -103,6 +104,7 @@ def midi_decode(midi,
     merged_volume = None
 
     for track in midi.tracks:
+        channels = []
                     
         # The downsampled sequences
         replay_sequence = []
@@ -113,8 +115,13 @@ def midi_decode(midi,
         volume_buffer = [np.zeros((classes,))]
 
         for i, msg in enumerate(track):
+            
+            if msg.type == PROGRAM_CHANGE:
+                if msg.program < 8:
+                    channels.append(msg.channel)
+                    
             if msg.type in [NOTE_ON, NOTE_OFF]:
-                if msg.channel > 7:
+                if msg.channel not in channels:
                     continue
 
             # Duplicate the last note pattern to wait for next event

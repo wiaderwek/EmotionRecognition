@@ -83,13 +83,17 @@ def load_all(emotions, time_steps):
         
         # Parallel process all files into a list of music sequences
         seqs = Parallel(n_jobs=multiprocessing.cpu_count(), backend='threading')(delayed(load_midi)(f) for f in get_all_files([emotion]))
+        continue
 
         for seq in seqs:
+            # Clamp MIDI to note range
+            seq = clamp_midi(seq)
+              
+            # Clean data form empty sequences
+            seq = clean_data(seq, time_steps)
+                
             if len(seq) >= time_steps:
-                # Clamp MIDI to note range
-                seq = clamp_midi(seq)
                 # Create training data and labels
-                seq = clean_data(seq, time_steps)
                 train_data, label_data = stagger(seq, time_steps)
                 
                 note_data += train_data

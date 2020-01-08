@@ -17,11 +17,11 @@ MIDI_MAX_NOTES = 128
 MAX_VELOCITY = 127
 
 # Number of octaves supported
-NUM_OCTAVES = 4
+NUM_OCTAVES = 8
 OCTAVE = 12
 
 # Min and max note (in MIDI note number)
-MIN_NOTE = 36
+MIN_NOTE = 20
 MAX_NOTE = MIN_NOTE + NUM_OCTAVES * OCTAVE
 NUM_NOTES = MAX_NOTE - MIN_NOTE
 
@@ -36,6 +36,7 @@ NOTES_PER_BAR = NOTES_PER_BEAT * BEATS_PER_BAR
 NOTE_ON = 'note_on'
 NOTE_OFF = 'note_off'
 END_OF_TRACK = 'end_of_track'
+PROGRAM_CHANGE = 'program_change'
 
 # Training parameters
 BATCH_SIZE = 16
