@@ -5,7 +5,7 @@ import mido
 import numpy as np
 import os
 import operator
-from constants import *
+from music_generation_constants import *
 
 def midi_encode(note_seq, resolution=NOTES_PER_BEAT, step=120):
     """

@@ -12,7 +12,7 @@ import random
 import os
 import functools
 
-from constants import *
+from music_generation_constants import *
 from midi_util import *
 
 class threadsafe_iterator:
@@ -82,7 +82,7 @@ def load_all(emotions, time_steps):
         emotion_hot = one_hot(emotion_id , NUM_EMOTIONS)
         
         # Parallel process all files into a list of music sequences
-        seqs = Parallel(n_jobs=multiprocessing.cpu_count(), backend='threading')(delayed(load_midi)(f) for f in get_all_files([emotion]))
+        seqs = Parallel(n_jobs=multiprocessing.cpu_count(), backend='threading')(delayed(load_midi)(f) for f in get_all_files([os.path.join(DATA_DIR, emotion)]))
         continue
 
         for seq in seqs:
