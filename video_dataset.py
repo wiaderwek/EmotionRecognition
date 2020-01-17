@@ -51,8 +51,12 @@ class DataSet():
         self.data = self.get_data()
         
         # Filter data
-        self.filter_number = self.find_filter_number()
+        #self.filter_number = self.find_divide_number()
+        self.filter_number = FILTER_NUM
         self.data = self.filter_data(self.filter_number)
+        
+        #extract frames from videos
+        self.extract_data()
 
         # Now do some minor data cleaning.
         self.data = self.clean_data()
@@ -71,11 +75,17 @@ class DataSet():
             valency = splitted_res[2]
             arousal = splitted_res[3]
             emotion_class = DataSet.get_class_for_arousal_and_valency(int(arousal), int(valency))
-            number_of_frames = self.extract_data_for_video(video_name)
+            #number_of_frames = self.extract_data_for_video(video_name)
             #print(video_name + ": " + arousal + ", " + valency + ", " + emotion_class.name + ", " + str(number_of_frames))
-            data.append([video_name, int(valency), int(arousal), emotion_class, number_of_frames])
+            data.append([video_name, int(valency), int(arousal), emotion_class])
 
         return data
+    
+    def extract_data(self):
+        for video in self.data:
+            number_of_frames = self.extract_data_for_video(video[0])
+            video.append(number_of_frames)
+            
         
     @staticmethod
     def get_class_for_arousal_and_valency(arousal, valency):

@@ -10,13 +10,13 @@ VIDO_EXTENSION = ".mp4"
 PATH_TO_DATASET = os.path.join(PATH_TO_DATA, DATASET_FOLDER)
 OUT_FOLDER = 'video_analysis/out'
 MODEL_DIR = os.path.join(OUT_FOLDER, 'models')
-MODEL_FILE = os.path.join(OUT_FOLDER, 'model.h5')
+MODEL_FILE = os.path.join(MODEL_DIR, 'model.h5')
 CACHE_DIR = os.path.join(OUT_FOLDER, 'cache')
 
 MIN_NEUTRAL_LEVEL_VALUE = 3600
 MAX_NEUTRAL_LEVEL_VALUE = 6300
 SPLIT_LEVEL = 5000
-FILTER_NUM = 700
+FILTER_NUM = 50
 
 FRAME_SIZE = 100
 MAX_FRAMES = 300
