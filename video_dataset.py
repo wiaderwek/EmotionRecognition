@@ -83,7 +83,7 @@ class DataSet():
     
     def extract_data(self):
         for video in self.data:
-            number_of_frames = self.extract_data_for_video(video[0])
+            number_of_frames = self.extract_data_for_video(self.path_to_extracted_data, video[0])
             video.append(number_of_frames)
             
         
@@ -113,26 +113,36 @@ class DataSet():
                 return VideoClass.HALV
             else:
                 return VideoClass.HAHV
-            
-    def extract_data_for_video(self, video_name):
-        if not os.path.isdir(self.path_to_extracted_data):
-            os.mkdir(self.path_to_extracted_data)
-        if not os.path.isdir(os.path.join(self.path_to_extracted_data, video_name)):
-            os.mkdir(os.path.join(self.path_to_extracted_data, video_name))
-            
-        if not self.check_if_video_is_extracted(video_name):
-            src = os.path.join(self.path_to_dataset, video_name + VIDO_EXTENSION)
-            dest = os.path.join(self.path_to_extracted_data, video_name,
+    
+    def get_frames_to_predict(self, video_dir, video_name):
+        if not os.path.isdir(os.path.join(video_dir, video_name)):
+            os.mkdir(os.path.join(video_dir, video_name))
+        if not self.check_if_video_is_extracted(video_dir, video_name):
+            src = os.path.join(video_dir, video_name + VIDO_EXTENSION)
+            dest = os.path.join(video_dir, video_name,
                         '%04d.jpg')
             call(["ffmpeg", "-i", src, dest])
-        return len(self.get_frames_for_video(video_name))
+        return self.get_sequence(video_dir, video_name)
             
-    def get_frames_for_video(self, video_name):
-        images = sorted(glob.glob(os.path.join(self.path_to_extracted_data, video_name, '*jpg')))
+    def extract_data_for_video(self, video_dir, video_name):
+        if not os.path.isdir(video_dir):
+            os.mkdir(self.video_dir)
+        if not os.path.isdir(os.path.join(video_dir, video_name)):
+            os.mkdir(os.path.join(video_dir, video_name))
+            
+        if not self.check_if_video_is_extracted(video_dir, video_name):
+            src = os.path.join(video_dir, video_name + VIDO_EXTENSION)
+            dest = os.path.join(video_dir, video_name,
+                        '%04d.jpg')
+            call(["ffmpeg", "-i", src, dest])
+        return len(self.get_frames_for_video(video_dir, video_name))
+    
+    def get_frames_for_video(self, video_dir, video_name):
+        images = sorted(glob.glob(os.path.join(video_dir, video_name, '*jpg')))
         return images
         
-    def check_if_video_is_extracted(self, video_name):
-        return bool(os.path.exists(os.path.join(self.path_to_extracted_data, video_name,
+    def check_if_video_is_extracted(self, video_dir, video_name):
+        return bool(os.path.exists(os.path.join(video_dir, video_name,
                                '0001.jpg')))
         
     def clean_data(self):
@@ -220,9 +230,7 @@ class DataSet():
         X, y = [], []
         for row in data:
             print(row[0])
-            frames = self.get_frames_for_video(row[0])
-            frames = DataSet.rescale_list(frames, self.seq_length)
-            sequence = self.build_image_sequence(frames)
+            sequence = get_sequence(self.path_to_extracted_data, row[0])
             X.append(sequence)
             y.append(self.get_class_one_hot(row[3]))
             
@@ -239,13 +247,17 @@ class DataSet():
             X, y = [], []
             for _ in range(batch_size):
                 sample = random.choice(data)
-                frames = self.get_frames_for_video(sample[0])
-                frames = DataSet.rescale_list(frames, self.seq_length)
-                sequence = self.build_image_sequence(frames)
+                sequence = get_sequence(self.path_to_extracted_data, sample[0])
                 X.append(sequence)
                 y.append(self.get_class_one_hot(sample[3]))
         
             yield np.array(X), np.array(y)
+    
+    def get_sequence(self, video_dir, video_name):
+        frames = self.get_frames_for_video(video_dir, video_name)
+        frames = DataSet.rescale_list(frames, self.seq_length)
+        sequence = self.build_image_sequence(frames)
+        return sequence
             
     def get_class_one_hot(self, video_class):
         # Now one-hot it.
