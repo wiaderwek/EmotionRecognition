@@ -122,7 +122,7 @@ class DataSet():
             dest = os.path.join(video_dir, video_name,
                         '%04d.jpg')
             call(["ffmpeg", "-i", src, dest])
-        return self.get_sequence(video_dir, video_name)
+        return self.get_sequence(video_dir, video_name), len(self.get_frames_for_video(video_dir, video_name))
             
     def extract_data_for_video(self, video_dir, video_name):
         if not os.path.isdir(video_dir):

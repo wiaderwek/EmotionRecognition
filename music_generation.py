@@ -183,7 +183,6 @@ def build_models(time_steps=SEQ_LEN, input_dropout=0.2, dropout=0.5):
 
 def build_or_load(allow_load=True):
     models = build_models()
-    models[0].summary()
     if allow_load:
         try:
             models[0].load_weights(MODEL_FILE)
@@ -340,5 +339,7 @@ def write_file(name, results):
         fpath = os.path.join(SAMPLES_DIR, name + '_' + str(i) + '.mid')
         print('Writing file', fpath)
         os.makedirs(os.path.dirname(fpath), exist_ok=True)
+        
         mid = midi_encode(unclamp_midi(result))
+        
         mid.save(fpath)

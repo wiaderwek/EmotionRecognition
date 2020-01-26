@@ -13,6 +13,7 @@ import time
 import os.path
 from video_analysis_constants import *
 from video_dataset import *
+import argparse
 
 class AVAnalysisModel():   
     def __init__(self, seq_length, load_model=False):
@@ -174,10 +175,28 @@ class EmotionAnalyser():
             data = DataSet(seq_length=seq_length, image_shape=image_shape)
         
         # Extract the sample from the data.
-        sample = data.get_frames_to_predict(video_dir, video_name)
+        sample, frames_num = data.get_frames_to_predict(video_dir, video_name)
         
         # Predict!
         prediction = self.model.model.predict(np.expand_dims(sample, axis=0))
-        print(prediction)
-        print(np.argmax(prediction[0]))
-        return np.argmax(prediction[0])
+        print("Predicted emotion: " + str(VideoClass(np.argmax(prediction[0]))))
+        return np.argmax(prediction[0]), frames_num
+    
+def main():
+    parser = argparse.ArgumentParser(description='Movies analysis.')
+    parser.add_argument('--dir', type=str, help='Film directory')
+    parser.add_argument('--name', type=str, help='Film name')
+    args = parser.parse_args()
+
+    ea = EmotionAnalyser()
+    seq_length = 40
+    image_shape = (80, 80, 3)
+    #video_dir = "/home/tomasz/Dokumenty/shared/predict"
+    video_dir = args.dir
+    #video_name = "ACCEDE00018"
+    video_name = args.name
+    pre, frames_num = ea.predict(40, (80, 80, 3), video_dir, video_name)
+    return pre
+    
+if __name__ == '__main__':
+    main()
