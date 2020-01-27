@@ -14,9 +14,9 @@ from keras.callbacks import EarlyStopping, TensorBoard
 from tqdm import tqdm
 from keras import losses
 from collections import deque
-from music_dataset import *
-from music_generation_constants import *
-from midi_util import *
+from datasets.music_dataset import *
+from constants.music_generation_constants import *
+from datasets.midi_util import *
 
 def one_hot(i, nb_classes):
     arr = np.zeros((nb_classes,))
@@ -330,7 +330,7 @@ def write_file(name, results):
     results = zip(*list(results))
 
     for i, result in enumerate(results):
-        fpath = os.path.join(SAMPLES_DIR, name + '_' + str(i) + '.mid')
+        fpath = os.path.join(SAMPLES_DIR, name + '.mid')
         print('Writing file', fpath)
         os.makedirs(os.path.dirname(fpath), exist_ok=True)
         
@@ -342,9 +342,11 @@ def main():
     parser = argparse.ArgumentParser(description='Movies analysis.')
     parser.add_argument('--emotion', type=str, help='Emotion for music')
     parser.add_argument('--len', default = 10, type=int, help='Music length in seconds')
+    parser.add_argument('--out', type=str, help='Out file name')
     args = parser.parse_args()
     
     assert args.len > 0
+    assert len(args.out) > 0
     try:
         emotion_id = EMOTIONS.index(args.emotion)
     except ValueError as val:
@@ -355,7 +357,7 @@ def main():
     seconds = args.len
     bars = math.ceil(seconds/BARS_PER_SECONDS)
     models = build_or_load()
-    write_file('output', generate(models, bars, [emotion_hot]))
+    write_file(args.out, generate(models, bars, [emotion_hot]))
     
 if __name__ == '__main__':
     main()

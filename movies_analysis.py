@@ -11,8 +11,8 @@ from collections import deque
 import sys
 import time
 import os.path
-from video_analysis_constants import *
-from video_dataset import *
+from constants.video_analysis_constants import *
+from datasets.video_dataset import *
 import argparse
 
 class AVAnalysisModel():   
@@ -187,13 +187,14 @@ def main():
     parser.add_argument('--dir', type=str, help='Film directory')
     parser.add_argument('--name', type=str, help='Film name')
     args = parser.parse_args()
+    
+    assert len(args.dir) > 0
+    assert len(args.name) > 0
 
     ea = EmotionAnalyser()
-    seq_length = 40
-    image_shape = (80, 80, 3)
     video_dir = args.dir
     video_name = args.name
-    pre, frames_num = ea.predict(40, (80, 80, 3), video_dir, video_name)
+    pre, frames_num = ea.predict(SEQ_LENGTH, IMG_SHAPE, video_dir, video_name)
     return pre
     
 if __name__ == '__main__':
