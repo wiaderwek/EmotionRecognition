@@ -32,6 +32,9 @@ NOTES_PER_BEAT = 4
 # The quickest note is a half-note
 NOTES_PER_BAR = NOTES_PER_BEAT * BEATS_PER_BAR
 
+#number of bars per second
+BARS_PER_SECONDS = 2
+
 # Notes
 NOTE_ON = 'note_on'
 NOTE_OFF = 'note_off'

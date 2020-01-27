@@ -42,6 +42,7 @@ def midi_encode(note_seq, resolution=NOTES_PER_BEAT, step=120):
                                        time = (tick - last_msg_tick) * step
                                       )
                     track.append(msg)
+                    
                     last_msg_tick = tick
                 elif current[index] > 0 and next_volume == 0:
                     # Was on, but now turned off
@@ -81,12 +82,6 @@ def midi_encode(note_seq, resolution=NOTES_PER_BEAT, step=120):
                                   )
             track.append(msg)
             last_msg_tick = tick
-
-    # Add the end of track event, append it to the track
-    #eot = mido.Message(END_OF_TRACK,
-    #                   time = 0
-    #                  )
-    #track.append(eot)
 
     return midi
 
