@@ -191,9 +191,7 @@ def main():
     ea = EmotionAnalyser()
     seq_length = 40
     image_shape = (80, 80, 3)
-    #video_dir = "/home/tomasz/Dokumenty/shared/predict"
     video_dir = args.dir
-    #video_name = "ACCEDE00018"
     video_name = args.name
     pre, frames_num = ea.predict(40, (80, 80, 3), video_dir, video_name)
     return pre

@@ -75,8 +75,6 @@ class DataSet():
             valency = splitted_res[2]
             arousal = splitted_res[3]
             emotion_class = DataSet.get_class_for_arousal_and_valency(int(arousal), int(valency))
-            #number_of_frames = self.extract_data_for_video(video_name)
-            #print(video_name + ": " + arousal + ", " + valency + ", " + emotion_class.name + ", " + str(number_of_frames))
             data.append([video_name, int(valency), int(arousal), emotion_class])
 
         return data

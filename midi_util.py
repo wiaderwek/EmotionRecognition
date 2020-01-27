@@ -198,9 +198,9 @@ def load_midi(fname):
     try:
         midi = mido.MidiFile(fname)
     except OSError as e:
-        print(fname)
+        print(e)
     except ValueError as val:
-        print(fname)
+        print(val)
     cache_path = os.path.join(CACHE_DIR, fname + '.npy')
     try:
         note_seq = np.load(cache_path)

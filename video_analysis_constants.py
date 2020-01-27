@@ -2,7 +2,7 @@ import os
 from enum import Enum
 
 PATH_TO_PROJECT = os.getcwd()
-PATH_TO_DATA = "/home/tomasz/Dokumenty/shared/"
+PATH_TO_DATA = "data/"
 DATASET_FOLDER = "video"
 EXTRACTED_DATA_FOLDER = "extracted_data"
 DATASET_RESULT_FILE = "ACCEDEranking.txt"
