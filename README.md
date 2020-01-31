@@ -1,4 +1,4 @@
-#Generowanie ścieżek dźwiękowych do flimów na podstawie emocji
+###Generowanie ścieżek dźwiękowych do flimów na podstawie emocji
 
 ### Celem projektu jest tworzenie muzyki na podstawie emocji zawartych w filmach
 
