@@ -38,7 +38,7 @@ HALV - emocje straszne (High Arousal Low Valency)
 HAHV - emocje wesołe (High Arousal High Valency)
 
 przykład wywołania:
-python3 movies_analysis.py --dir "examples/films/" --name "ACCEDE00000"
+python movies_analysis.py --dir "examples/films/" --name "ACCEDE00000"
 
 
 ### music_generation.py
@@ -49,7 +49,7 @@ Argumenty wywołania:
 --out - nazwa pliku wynikowego (plik wynikowy znajdzie się w ścieżce music_generation/out/samples/)
 
 przykład wywołania:
-python3 music_generation.py --emotion "Neutral" --len 10 --out "output"
+python music_generation.py --emotion "Neutral" --len 10 --out "output"
 
 
 ### generate_soundtrack.py
@@ -60,7 +60,7 @@ Argumenty wywołania:
 --out - nazwa pliku wynikowego (plik wynikowy znajdzie się w ścieżce music_generation/out/samples/)
 
 przykład wywołania:
-python3 movies_analysis.py --dir "examples/films/" --name "ACCEDE00000" --out "output"
+python movies_analysis.py --dir "examples/films/" --name "ACCEDE00000" --out "output"
 
 ### Dane uczące
 Niestety z racji rozmiarów użytych zbiorów danych uczących nie jestem w stanie umieścić ich na płycie.
@@ -69,6 +69,10 @@ Dane do nauki sieci generującej muzykę: Multi-modal MIREX-like emotion dataset
 
 ### Instrukcja konfiguracji środowiska uruchomieniowego
 Aby wykonać jeden z dostępnych skryptów należy:
-1. Zainstalować narzędzie pip (zarządca pakietów języka python) i kompilator język Python.
-2. 
+1. Zainstalować narzędzie Pip3 (zarządca pakietów języka python) i kompilator język Python oraz python3-tk.
+2. Za pomocą Pip zainstalować narzędzie Virtualenv do towrzenia lokalnych środowisk programistycznych: pip3 install virtualenv.
+3. Przejdź do folderu z projektem.
+4. Utowrzyć wirtualne środowisko: virtualenv env.
+5. Aktywuj wirtualne środowisko: source env/bin/activate.
+6. Zainstalować wymagane pakiety: pip3 install -r requirements.txt
 
