@@ -11,8 +11,8 @@ from collections import deque
 import sys
 import time
 import os.path
-from video_analysis_constants import *
-from video_dataset import *
+from constants.video_analysis_constants import *
+from datasets.video_dataset import *
 import argparse
 
 class AVAnalysisModel():   
@@ -55,6 +55,7 @@ class AVAnalysisModel():
             model.add(TimeDistributed(Activation('relu')))
             # max pool
             model.add(TimeDistributed(MaxPooling2D((2, 2), strides=(2, 2))))
+            model.add(TimeDistributed(Dropout(0.25)))
 
             return model
 
@@ -64,23 +65,19 @@ class AVAnalysisModel():
         model = Sequential()
 
         # first (non-default) block
-        model.add(TimeDistributed(Conv2D(32, (7, 7), strides=(2, 2), padding='same',
+        model.add(TimeDistributed(Conv2D(64, (7, 7), strides=(2, 2), padding='same',
                                          kernel_initializer=initialiser, kernel_regularizer=l2(l=reg_lambda)),
                                   input_shape=self.input_shape))
         model.add(TimeDistributed(BatchNormalization()))
         model.add(TimeDistributed(Activation('relu')))
-        model.add(TimeDistributed(Conv2D(32, (3,3), kernel_initializer=initialiser, kernel_regularizer=l2(l=reg_lambda))))
+        model.add(TimeDistributed(Conv2D(64, (3,3), kernel_initializer=initialiser, kernel_regularizer=l2(l=reg_lambda))))
         model.add(TimeDistributed(BatchNormalization()))
         model.add(TimeDistributed(Activation('relu')))
         model.add(TimeDistributed(MaxPooling2D((2, 2), strides=(2, 2))))
+        model.add(TimeDistributed(Dropout(0.25)))
 
-        # 2nd-5th (default) blocks
-        #model = add_default_block(model, 64,  init=initialiser, reg_lambda=reg_lambda)
-        #model = add_default_block(model, 128, init=initialiser, reg_lambda=reg_lambda)
-        #model = add_default_block(model, 256, init=initialiser, reg_lambda=reg_lambda)
-        #model = add_default_block(model, 512, init=initialiser, reg_lambda=reg_lambda)
-        model = add_default_block(model, 92, init=initialiser, reg_lambda=reg_lambda)
-        model = add_default_block(model, 196, init=initialiser, reg_lambda=reg_lambda)
+        model = add_default_block(model, 128,  init=initialiser, reg_lambda=reg_lambda)
+        model = add_default_block(model, 256, init=initialiser, reg_lambda=reg_lambda)
         
         # LSTM output head
         model.add(TimeDistributed(Flatten()))
@@ -187,15 +184,14 @@ def main():
     parser.add_argument('--dir', type=str, help='Film directory')
     parser.add_argument('--name', type=str, help='Film name')
     args = parser.parse_args()
+    
+    assert len(args.dir) > 0
+    assert len(args.name) > 0
 
     ea = EmotionAnalyser()
-    seq_length = 40
-    image_shape = (80, 80, 3)
-    #video_dir = "/home/tomasz/Dokumenty/shared/predict"
     video_dir = args.dir
-    #video_name = "ACCEDE00018"
     video_name = args.name
-    pre, frames_num = ea.predict(40, (80, 80, 3), video_dir, video_name)
+    pre, frames_num = ea.predict(SEQ_LENGTH, IMG_SHAPE, video_dir, video_name)
     return pre
     
 if __name__ == '__main__':

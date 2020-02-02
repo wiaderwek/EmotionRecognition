@@ -14,9 +14,9 @@ from keras.callbacks import EarlyStopping, TensorBoard
 from tqdm import tqdm
 from keras import losses
 from collections import deque
-from music_dataset import *
-from music_generation_constants import *
-from midi_util import *
+from datasets.music_dataset import *
+from constants.music_generation_constants import *
+from datasets.midi_util import *
 
 def one_hot(i, nb_classes):
     arr = np.zeros((nb_classes,))
@@ -64,7 +64,6 @@ def time_axis(dropout):
     def f(notes, beat, emotion):
         time_steps = int(notes.get_shape()[1])
 
-        # TODO: Experiment with when to apply conv
         note_octave = TimeDistributed(Conv1D(OCTAVE_UNITS, 2 * OCTAVE, padding='same'))(notes)
         note_octave = Activation('tanh')(note_octave)
         note_octave = Dropout(dropout)(note_octave)
@@ -111,10 +110,6 @@ def note_axis(dropout):
         
         # Shift target one note to the left.
         shift_chosen = Lambda(lambda x: tf.pad(x[:, :, :-1, :], tf.constant([[0, 0], [0, 0], [1, 0], [0, 0]])))(chosen)
-
-        # [batch, time, notes, 1]
-        #shift_chosen = Reshape((time_steps, NUM_NOTES, 3))(shift_chosen)
-        # [batch, time, notes, features + 1]
         
         x = Concatenate(axis=3)([x, shift_chosen])
 
@@ -199,7 +194,6 @@ def train(use_data_generator = False):
     cbs = [
         ModelCheckpoint(MODEL_FILE, monitor='loss', save_best_only=True, save_weights_only=True),
         EarlyStopping(monitor='loss', patience=5)
-        #TensorBoard(log_dir='out/logs', histogram_freq=1)
     ]
 
     print('Training')
@@ -336,10 +330,34 @@ def write_file(name, results):
     results = zip(*list(results))
 
     for i, result in enumerate(results):
-        fpath = os.path.join(SAMPLES_DIR, name + '_' + str(i) + '.mid')
+        fpath = os.path.join(SAMPLES_DIR, name + '.mid')
         print('Writing file', fpath)
         os.makedirs(os.path.dirname(fpath), exist_ok=True)
         
         mid = midi_encode(unclamp_midi(result))
         
         mid.save(fpath)
+        
+def main():
+    parser = argparse.ArgumentParser(description='Movies analysis.')
+    parser.add_argument('--emotion', type=str, help='Emotion for music')
+    parser.add_argument('--len', default = 10, type=int, help='Music length in seconds')
+    parser.add_argument('--out', type=str, help='Out file name')
+    args = parser.parse_args()
+    
+    assert args.len > 0
+    assert len(args.out) > 0
+    try:
+        emotion_id = EMOTIONS.index(args.emotion)
+    except ValueError as val:
+        print("No such emotion! Choose from: " + str(EMOTIONS))
+        return
+    emotion_hot = one_hot(emotion_id , NUM_EMOTIONS)
+
+    seconds = args.len
+    bars = math.ceil(seconds/BARS_PER_SECONDS)
+    models = build_or_load()
+    write_file(args.out, generate(models, bars, [emotion_hot]))
+    
+if __name__ == '__main__':
+    main()
