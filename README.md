@@ -76,3 +76,6 @@ Aby wykonać jeden z dostępnych skryptów należy:
 5. Aktywuj wirtualne środowisko: source env/bin/activate.
 6. Zainstalować wymagane pakiety: pip3 install -r requirements.txt
 
+### Uwaga
+Instrukcja nie zawiera instalacji sterowników do karty graficznej i oprogramowania CUDA, ponieważ instrukcja jest specyficzna dla różnych systemów.
+

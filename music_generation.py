@@ -340,9 +340,9 @@ def write_file(name, results):
         
 def main():
     parser = argparse.ArgumentParser(description='Movies analysis.')
-    parser.add_argument('--emotion', type=str, help='Emotion for music')
+    parser.add_argument('--emotion', default = 'Neutral', type=str, help='Emotion for music [Neutral, LALV, LAHV, HALV, HAHV]')
     parser.add_argument('--len', default = 10, type=int, help='Music length in seconds')
-    parser.add_argument('--out', type=str, help='Out file name')
+    parser.add_argument('--out', default = 'Neutral_example',type=str, help='Out file name')
     args = parser.parse_args()
     
     assert args.len > 0
